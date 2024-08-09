@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot da Empresa</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Bem-vindo ao Chatbot da Empresa!</h1>
+    <div id="chatbox">
+        <div id="messages"></div>
+        <div id="typing-indicator" style="display:none;">
+            <img src="/static/typing.gif" alt="Digitando..." />
+            <strong>Chatbot está digitando...</strong>
+        </div>
+        <input type="text" id="pergunta" placeholder="Digite sua pergunta..." onkeydown="checkEnter(event)">
+        <button onclick="sendMessage()">Enviar</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const pergunta = document.getElementById('pergunta').value;
+            if (pergunta.trim() === '') return;
+            
+            const messages = document.getElementById('messages');
+            messages.innerHTML += `<div><strong>Você:</strong> ${pergunta}</div>`;
+            document.getElementById('pergunta').value = '';
+
+            // Mostra o indicador de digitação do chatbot
+            const typingIndicator = document.getElementById('typing-indicator');
+            typingIndicator.style.display = 'block';
+
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ pergunta })
+            });
+
+            const data = await response.json();
+
+            // Esconde o indicador de digitação e adiciona a resposta do chatbot
+            typingIndicator.style.display = 'none';
+            messages.innerHTML += `<div><strong>Chatbot:</strong> ${data.resposta}</div>`;
+            messages.scrollTop = messages.scrollHeight; // Rola para a última mensagem
+        }
+
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>

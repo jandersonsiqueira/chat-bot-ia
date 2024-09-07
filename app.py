@@ -1,10 +1,12 @@
+import os
+
 from flask import Flask, request, jsonify, render_template
 
 from openai import OpenAI
 
 app = Flask(__name__)
 
-client = OpenAI(api_key='SUA-CHAVE-API')
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 def carregar_informacoes():
     with open('informacoes.txt', 'r', encoding='utf-8') as f:
